@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+    <head>
+
+        <style media="screen" type="text/css">
+
+            body {
+             background-image: url("fresh_snow.png");
+            }
+
+            html {
+              font-family: Geneva, Tahoma, Verdana, sans-serif;
+            }
+
+            #title-container {
+                max-width: 1000px;
+                margin: 0 auto;
+                moz-border-radius: 15px;
+                border-radius: 15px;
+                padding: 10px;
+            }
+
+            #title {
+                display:block;
+                width: 1000px;
+                height: 100%;
+                margin: 0 auto;
+                font-size: 46px;
+                font-weight: bold;
+                margin-top: 13px;
+                padding: 4px;
+                text-align: center;
+            }
+
+
+            #main-content {
+                margin-top: 10px;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 10px;
+            }
+
+            #prompt {
+                margin-left: auto;
+                margin-right: auto;
+                moz-border-radius: 15px;
+                border-radius: 15px;
+                padding: 10px;
+                text-align:center;
+            }
+
+            #usernameform {
+                display: inline;
+            }
+
+            .artist {
+                display: table;
+                width: 1px;
+                padding: 10px;
+            }
+
+            #artistcontainer {
+                margin: 0 auto;
+                width: 80%;
+                margin-top: 10px;
+            }
+
+            .subtext {
+                color: #1D1D1F;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            .BigTextBox {
+                border-style: none;
+                moz-border-radius: 15px;
+                border-radius: 15px;
+                padding-left: 10px;
+                padding-top: 0px;
+                font-size: 22px;
+                font-weight: bold;
+                color: #333;
+                width: 150px;
+                height: 38px;
+                margin-top: 9px;
+            }
+
+            .prompttext {
+                padding-top: 0px;
+                font-size: 22px;
+                font-weight: bold;
+                height: 38px;
+                margin-top: 9px;
+                padding: 4px;
+                text-align: center;
+            }
+
+            .picker{
+                padding: 10px;
+            }
+
+            #month {
+                display: inline-block;
+                width: 125px;
+            }
+
+
+            #year {
+                display: inline-block;
+                width: 60px;
+            }
+
+            .pointer{
+                cursor: pointer;
+                vertical-align: 2px
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            #noresultsmessage {
+                width: 50%;
+                margin: 0 auto;
+                text-align: center;
+                padding: 40px;
+                font-size: 30px;
+                font-weight: bold;
+            }
+
+            .details {
+                width: 300px;
+                height: 300px;
+            }
+
+        </style>
+
+        <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="bower_components/ngprogress/ngProgress.css" media="screen" />
+
+    </head>
+
+        <body>
+        <div id="title-container" >
+            <span id="title">
+                Your Last.fm History
+            </span>
+        </div>
+        <div id="main-content" ng-controller="TrackCtrl">
+            <div id="prompt">
+                <span id="prompttextcontainer">
+                    <span class="prompttext">What was</span>
+                    <form id="usernameform" ng-submit="getTracks()">
+                        <input class="BigTextBox" ng-model="username" placeholder="satshabad" type="text">
+                    </form>
+                    <span class="prompttext">listening to in </span>
+                    <span class="picker">
+                        <i ng-click="subMonth()" class="glyphicon glyphicon-arrow-left pointer" ></i>
+                        <span id="month" class="prompttext" >{{months[monthIndex]}}</span>
+                        <i ng-click="incMonth()" class="glyphicon glyphicon-arrow-right pointer" ></i>
+                    </span>
+                    <span class="picker">
+                        <i ng-click="subYear()" class="glyphicon glyphicon-arrow-left pointer" ></i>
+
+                        <span id="year" class="prompttext">{{years[yearIndex]}}</span>
+                        <i ng-click="incYear()" class="glyphicon glyphicon-arrow-right pointer" ></i>
+                    </span>
+
+                    <span class="prompttext">?</span>
+                </span>
+            </div>
+
+            <div id="artistcontainer" masonry>
+
+                <div ng-show="showError()" id="noresultsmessage">
+                   Nothing apparently... how about giving {{suggestion.name}} a listen?
+                </div>
+
+                <span ng-click="changeSelected($index)" class="masonry-brick artist" ng-repeat="artist in artists"  ng-show="imageSource(artist)">
+                    <img class="artistimg" ng-src="{{imageSource(artist)}}" />
+
+                    <p class="subtext" >{{artist[0]}}</p>
+
+                </span>
+
+            </div>
+        </div>
+        </body>
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-resource.js"></script>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+        <script type="text/javascript" src="angular-underscore.js"></script>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.4.0/moment.min.js"></script>
+        <script src="bower_components/angular-moment/angular-moment.min.js"></script>
+
+        <script type="text/javascript" src="angular-underscore.js"></script>
+        <script type="text/javascript" src="ui-bootstrap-0.7.0.js"></script>
+
+        <script src="bower_components/ngprogress/build/ngProgress.js"></script>
+
+        <script src="bower_components/get-style-property/get-style-property.js"></script>
+        <script src="bower_components/get-size/get-size.js"></script>
+        <script src="bower_components/eventie/eventie.js"></script>
+        <script src="bower_components/doc-ready/doc-ready.js"></script>
+        <script src="bower_components/eventEmitter/EventEmitter.js"></script>
+        <script src="bower_components/jquery-bridget/jquery.bridget.js"></script>
+        <script src="bower_components/matches-selector/matches-selector.js"></script>
+        <script src="bower_components/outlayer/item.js"></script>
+        <script src="bower_components/outlayer/outlayer.js"></script>
+        <script src="bower_components/masonry/masonry.js"></script>
+        <script src="bower_components/imagesloaded/imagesloaded.js"></script>
+        <script src="bower_components/angular-masonry/angular-masonry.js"></script>
+
+
+        <script src="app.js"></script>
+        <script src="controllers.js"></script>
+        <script src="services.js"></script>
+</html>
